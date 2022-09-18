@@ -21,7 +21,7 @@ public class DisconnectPacket extends Packet {
 
     @Override
     public void writeData(GameClient c) {
-
+        c.sendData(getData());
     }
 
     @Override

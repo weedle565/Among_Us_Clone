@@ -5,6 +5,7 @@ import com.ollie.amogus.gameobjects.Wall;
 import com.ollie.amogus.imagehandling.MirrorHandler;
 import com.ollie.amogus.imagehandling.SpriteSheetLoader;
 import com.ollie.amogus.main.Frame;
+import com.ollie.amogus.networking.MovePacket;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -62,6 +63,11 @@ public class Crewmate extends GameObject {
     @Override
     public synchronized void updatePos(int x, int y){
 
+        setFakeX(x);
+        setFakeY(y);
+
+        MovePacket mp = new MovePacket(getUserName(), getFakeX(), getFakeY(), true, directions.ordinal());
+        mp.writeData(Frame.getG().getClient());
     }
 
     public synchronized boolean checkCollisions(int x, int y){
@@ -69,7 +75,7 @@ public class Crewmate extends GameObject {
         for(Wall w : Frame.getG().getWalls()){
 
             Rectangle newDetector = new Rectangle(getX(), getY(), (int) getCollisionDetector().getBounds().getWidth(), (int) getCollisionDetector().getBounds().getHeight());
-            System.out.println(newDetector.getX() + " " + newDetector.getY() + " " + ((Rectangle) w.getCollisionDetector()).getX() + ((Rectangle) w.getCollisionDetector()).getY());
+            //System.out.println(newDetector.getX() + " " + newDetector.getY() + " " + ((Rectangle) w.getCollisionDetector()).getX() + ((Rectangle) w.getCollisionDetector()).getY());
             if(newDetector.intersects((Rectangle) w.getCollisionDetector())){
                 return true;
             }
@@ -102,4 +108,7 @@ public class Crewmate extends GameObject {
 
     }
 
+    public String getUserName() {
+        return userName;
+    }
 }

@@ -24,8 +24,9 @@ public class LoginPacket extends Packet {
     }
 
     @Override
-    public void writeData(GameClient c) {
+    public void writeData(GameClient c ) {
 
+        c.sendData(getData());
     }
 
     @Override

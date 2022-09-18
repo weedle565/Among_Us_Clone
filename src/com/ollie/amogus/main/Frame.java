@@ -3,20 +3,20 @@ package com.ollie.amogus.main;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 public class Frame {
 
-    private JFrame mainFrame;
     private static Game g;
 
     public Frame(){
         try{
             g = new Game();
         } catch (IOException e){
-        e.printStackTrace();
+            e.printStackTrace();
         }
 
-        mainFrame = new JFrame();
+        JFrame mainFrame = new JFrame();
         mainFrame.setTitle("Amog");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.add(g);
@@ -24,7 +24,11 @@ public class Frame {
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
 
-        g.init();
+        try {
+            g.start();
+        } catch (UnknownHostException e){
+            e.printStackTrace();
+        }
     }
 
     public static Game getG() {

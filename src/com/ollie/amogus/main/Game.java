@@ -1,21 +1,28 @@
 package com.ollie.amogus.main;
 
-import com.ollie.amogus.gameobjects.Background;
+import com.ollie.amogus.gameobjects.Map;
 import com.ollie.amogus.gameobjects.Wall;
 import com.ollie.amogus.gameobjects.entities.Crewmate;
 import com.ollie.amogus.gameobjects.entities.Directions;
+import com.ollie.amogus.gameobjects.entities.MPCrewMate;
+import com.ollie.amogus.networking.GameClient;
+import com.ollie.amogus.networking.GameServer;
+import com.ollie.amogus.networking.LoginPacket;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class Game extends Canvas implements Runnable {
 
-    private final Crewmate crew;
-    private final Background b;
+    private Crewmate crew;
+    private Map b;
 
     private final ArrayList<Wall> walls;
 
@@ -23,6 +30,9 @@ public class Game extends Canvas implements Runnable {
     private boolean left,right,up,down;
 
     private Thread thread;
+
+    private GameClient client;
+    private GameServer server;
 
     public Game() throws IOException {
 
@@ -36,21 +46,30 @@ public class Game extends Canvas implements Runnable {
         up = false;
         down = false;
 
-        crew = new Crewmate(512, 600, "Test");
-        b = new Background(-1400, -70);
-
         setPreferredSize(new Dimension(1024, 1024));
         setVisible(true);
 
     }
 
-    public void init(){
+    public void init() throws IOException {
+
+        crew = new MPCrewMate(512, 600, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
+
+        b = new Map(-1400, -70);
+        b.addCrewMate(crew);
 
         addKeyListener(new KeyInput());
 
+        LoginPacket lP = new LoginPacket(crew.getUserName(), crew.getX(), crew.getY());
+        if(server != null) {
+            server.addConnection((MPCrewMate) crew, lP);
+
+        }
+
+        lP.writeData(client);
+
         initWalls();
 
-        start();
         playing = true;
 
     }
@@ -61,10 +80,19 @@ public class Game extends Canvas implements Runnable {
 
     }
 
-    public synchronized void start(){
+    public synchronized void start() throws UnknownHostException {
 
         thread = new Thread(this);
         thread.start();
+
+        if(JOptionPane.showConfirmDialog(this, "Do you want to run the server") == 0){
+            server = new GameServer(this);
+            server.start();
+        }
+
+        client = new GameClient(this, InetAddress.getLocalHost().getHostAddress());
+        client.start();
+        System.out.println("client started");
     }
 
     public synchronized void kill(){
@@ -78,7 +106,13 @@ public class Game extends Canvas implements Runnable {
 
     }
 
-    public void run(){
+    public synchronized void run(){
+
+        try {
+            init();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         final int targetUpdates = 6;
         final double targetUpdateTime = 1000000000/targetUpdates;
@@ -126,6 +160,7 @@ public class Game extends Canvas implements Runnable {
                 ticks = 0;
                 timer += 1000;
 
+                System.out.println(b.getCrewmates());
             }
 
         }
@@ -138,22 +173,26 @@ public class Game extends Canvas implements Runnable {
 
         if(up && left) {
             if(crew.checkCollisions(-1, -1)) return;
-            System.out.println(crew.checkCollisions(-1,  -1));
+            crew.updatePos(1, 1);
             b.updatePos(-1, -1);
         }
         else if(up && right) {
             if(crew.checkCollisions(1, -1)) return;
+            crew.updatePos(-1, 1);
             b.updatePos(1, -1);
         }
         else if(down && left) {
             if(crew.checkCollisions(-1, 1)) return;
+            crew.updatePos(1, -1);
             b.updatePos(-1, 1);
         }
         else if(down && right) {
             if(crew.checkCollisions(1, 1)) return;
+            crew.updatePos(-1, -1);
             b.updatePos(1, 1);
         } else if(up) {
             if(crew.checkCollisions(0, -2)) return;
+            crew.updatePos(0, 2);
             b.updatePos(0, -2);
         }
 
@@ -185,7 +224,7 @@ public class Game extends Canvas implements Runnable {
         g.fillRect(0, 0, getWidth(), getHeight());
 
         b.drawImage(g);
-        crew.drawImage(g);
+        b.render(g);
 
         walls.iterator().forEachRemaining(w -> w.drawImage(g));
 
@@ -202,7 +241,7 @@ public class Game extends Canvas implements Runnable {
 
     }
 
-    public Background getB() {
+    public Map getB() {
         return b;
     }
 
@@ -232,4 +271,11 @@ public class Game extends Canvas implements Runnable {
         }
     }
 
+    public GameClient getClient() {
+        return client;
+    }
+
+    public GameServer getServer() {
+        return server;
+    }
 }

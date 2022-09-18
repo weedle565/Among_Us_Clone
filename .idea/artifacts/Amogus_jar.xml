@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Amogus:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Amogus_jar</output-path>
+    <root id="archive" name="Amogus.jar">
+      <element id="module-output" name="Amogus" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/openjfx-19_windows-x86_bin-sdk.zip" path-in-jar="/" />
+      <element id="directory" name="resoures">
+        <element id="dir-copy" path="$PROJECT_DIR$/resoures" />
+      </element>
+    </root>
+  </artifact>
+</component>

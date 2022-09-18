@@ -21,4 +21,12 @@ public class MPCrewMate extends Crewmate {
     public int getPort() {
         return port;
     }
+
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }
