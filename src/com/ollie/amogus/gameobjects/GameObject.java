@@ -5,12 +5,12 @@ import java.awt.image.BufferedImage;
 
 public abstract class GameObject {
 
-    private int x, y, fakeX, fakeY;
+    private float x, y, fakeX, fakeY;
     private final Shape collisionDetector;
 
     private BufferedImage[] sprites;
 
-    public GameObject(int x, int y, int sprites, Rectangle collisionDetector) {
+    public GameObject(float x, float y, int sprites, Rectangle collisionDetector) {
         this.x = x;
         this.y = y;
         this.fakeX = x;
@@ -19,43 +19,43 @@ public abstract class GameObject {
         this.collisionDetector = collisionDetector;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x += x;
     }
 
-    public void setNewX(int x){
+    public void setNewX(float x){
         this.x = x;
     }
 
-    public void setNewY(int y){
+    public void setNewY(float y){
         this.y = y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y += y;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public int getFakeX() {
+    public float getFakeX() {
         return fakeX;
     }
 
-    public int getFakeY() {
+    public float getFakeY() {
         return fakeY;
     }
 
-    public void setFakeX(int fakeX) {
+    public void setFakeX(float fakeX) {
         this.fakeX += fakeX;
     }
 
-    public void setFakeY(int fakeY) {
+    public void setFakeY(float fakeY) {
         this.fakeY += fakeY;
     }
 
@@ -73,5 +73,5 @@ public abstract class GameObject {
 
     public abstract void drawImage(Graphics g);
 
-    public abstract void updatePos(int x, int y);
+    public abstract void updatePos(float x, float y);
 }

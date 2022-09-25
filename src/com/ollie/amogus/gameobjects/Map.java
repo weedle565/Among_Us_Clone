@@ -24,6 +24,7 @@ public class Map {
 
         this.x = x;
         this.y = y;
+        //Find the map resource in the file given, done like this to allow for jar compilation
         backImage = ImageIO.read(Objects.requireNonNull(Map.class.getResource("/resoures/map.png")));
     }
 
@@ -33,6 +34,9 @@ public class Map {
 
     }
 
+    /*
+        When moving we move the background instead of the crewmate to allow for easier and smoother movement.
+     */
     public synchronized void updatePos(int x, int y) {
 
         if(com.ollie.amogus.main.Frame.getG().getCrew().checkCollisions(x, y)) return;
@@ -40,26 +44,28 @@ public class Map {
         setX(x);
         setY(y);
 
-        Frame.getG().getWalls().iterator().forEachRemaining(w -> w.updatePos(x, y));
-
     }
 
+    //Adds a new crewmate to the map
     public synchronized void addCrewMate(Crewmate c){
         crewmates.add(c);
     }
 
-    public void render(Graphics g){
-        for(Crewmate c : crewmates){
-            System.out.println(c.getUserName() + " " + c.getX() + " " + c.getY());
-            c.drawImage(g);
+    //Renders all crewmates on the map, used for rendering everything connected to the server
+    public void render(Graphics g, Crewmate currentClientCrew){
+        for(Crewmate crewmate : crewmates){
+
+            if(!crewmate.getUserName().equals(currentClientCrew.getUserName())) {
+                crewmate.drawImage(g);
+            }
         }
     }
 
     private int getCrewmateIndex(String username){
 
         int i = 0;
-        for(Crewmate c : crewmates){
-            if(c instanceof MPCrewMate && c.getUserName().equals(username))
+        for(Crewmate crewmate : crewmates){
+            if(crewmate instanceof MPCrewMate && crewmate.getUserName().equals(username))
                 break;
 
             i++;
@@ -69,7 +75,8 @@ public class Map {
 
     }
 
-    public synchronized void moveCrewmates(String username, int x, int y, Directions movingDir){
+    //Move a MPCrewmate on a specific client
+    public synchronized void moveCrewmates(String username, float x, float y, Directions movingDir){
 
         int i = getCrewmateIndex(username);
         MPCrewMate crewmate = (MPCrewMate) crewmates.get(i);

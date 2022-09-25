@@ -16,12 +16,12 @@ public class Wall extends GameObject {
     public void drawImage(Graphics g) {
 
         g.setColor(Color.RED);
-        g.drawRect(getX(), getY(), (int) ((Rectangle)super.getCollisionDetector()).getWidth(), (int) ((Rectangle)super.getCollisionDetector()).getHeight());
+        g.drawRect((int) getX(), (int) getY(), (int) ((Rectangle)super.getCollisionDetector()).getWidth(), (int) ((Rectangle)super.getCollisionDetector()).getHeight());
 
     }
 
     @Override
-    public synchronized void updatePos(int x, int y) {
+    public synchronized void updatePos(float x, float y) {
 
         setX(x);
         setY(y);

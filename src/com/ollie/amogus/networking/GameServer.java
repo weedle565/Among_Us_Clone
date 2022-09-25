@@ -4,13 +4,11 @@ import com.ollie.amogus.gameobjects.entities.MPCrewMate;
 import com.ollie.amogus.main.Game;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GameServer extends Thread {
@@ -130,7 +128,6 @@ public class GameServer extends Thread {
     public void sendData(byte[] data, InetAddress address, int port){
 
         DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-        System.out.println("sent");
         try{
             this.socket.send(packet);
         } catch (IOException e){

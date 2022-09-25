@@ -7,7 +7,7 @@ public class MPCrewMate extends Crewmate {
     private InetAddress ip;
     private int port;
 
-    public MPCrewMate(int x, int y, String userName, InetAddress ip, int port) {
+    public MPCrewMate(float x, float y, String userName, InetAddress ip, int port) {
         super(x, y, userName);
 
         this.ip = ip;

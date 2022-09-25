@@ -3,19 +3,19 @@ package com.ollie.amogus.networking;
 public class LoginPacket extends Packet {
 
     private String username;
-    private int x, y;
+    private float x, y;
 
     public LoginPacket(byte[] data){
         super(00);
 
         String[] dataArray = readData(data).split(",");
         this.username = dataArray[0];
-        this.x = Integer.parseInt(dataArray[1]);
-        this.y = Integer.parseInt(dataArray[2]);
+        this.x = Float.parseFloat(dataArray[1]);
+        this.y = Float.parseFloat(dataArray[2]);
 
     }
 
-    public LoginPacket(String username, int x, int y){
+    public LoginPacket(String username, float x, float y){
         super(00);
 
         this.username = username;
@@ -43,11 +43,11 @@ public class LoginPacket extends Packet {
         return username;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 }

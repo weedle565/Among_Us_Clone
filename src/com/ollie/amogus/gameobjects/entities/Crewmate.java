@@ -22,8 +22,8 @@ public class Crewmate extends GameObject {
 
     private Directions directions;
 
-    public Crewmate(int x, int y, String userName) {
-        super(x, y, 4, new Rectangle(x, y, 48, 48));
+    public Crewmate(float x, float y, String userName) {
+        super(x, y, 4, new Rectangle((int) x, (int) y, 48, 48));
 
         this.userName = userName;
 
@@ -36,11 +36,13 @@ public class Crewmate extends GameObject {
         directions = Directions.RIGHT;
 
         BufferedImage[] sprites = new BufferedImage[8];
+        //Load the sprites from the sprite sheet, (x, y);
         sprites[0] = SpriteSheetLoader.getSprite(0, 0);
         sprites[1] = SpriteSheetLoader.getSprite(1, 0);
         sprites[2] = SpriteSheetLoader.getSprite(2, 0);
         sprites[3] = SpriteSheetLoader.getSprite(3, 0);
 
+        //Mirror the sprites to be able to get the correct direction for going the opposite direction
         sprites[4] = MirrorHandler.mirrorer(sprites[0]);
         sprites[5] = MirrorHandler.mirrorer(sprites[1]);
         sprites[6] = MirrorHandler.mirrorer(sprites[2]);
@@ -56,15 +58,24 @@ public class Crewmate extends GameObject {
         if(directions == Directions.LEFT) modifier = 4;
         else if (directions == Directions.RIGHT) modifier = 0;
 
-         g.drawImage(super.getSprites()[displayNum + modifier], getX(), getY(), super.getSprites()[displayNum + modifier].getWidth()*3,super.getSprites()[displayNum + modifier].getHeight()*3, null);
+         g.drawImage((Image) super.getSprites()[displayNum + modifier], (int) getX(), (int) getY(), super.getSprites()[displayNum + modifier].getWidth()*3,super.getSprites()[displayNum + modifier].getHeight()*3, null);
          g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
     }
 
-    @Override
-    public synchronized void updatePos(int x, int y){
+    /*
+        Update the position of the crewmate on anothers screen, as the crewmates real x and y never changes we need
+        to work out where the crewmate should be on anothers screen, thus we use fake x and fake y.
+        The movement is halfed as for some reason during testing the movement would be twice as fast as actuality over
+        the network. On move, send a new move packet to the network with the fake x and y to update the position for other
+        players
+        @TODO Change directions.ordinal to getting a direction
 
-        setFakeX(x);
-        setFakeY(y);
+     */
+    @Override
+    public synchronized void updatePos(float x, float y){
+
+        setFakeX(x/5f);
+        setFakeY(y/5f);
 
         MovePacket mp = new MovePacket(getUserName(), getFakeX(), getFakeY(), true, directions.ordinal());
         mp.writeData(Frame.getG().getClient());
@@ -72,11 +83,11 @@ public class Crewmate extends GameObject {
 
     public synchronized boolean checkCollisions(int x, int y){
 
-        for(Wall w : Frame.getG().getWalls()){
+        for(Wall wall : Frame.getG().getWalls()){
 
-            Rectangle newDetector = new Rectangle(getX(), getY(), (int) getCollisionDetector().getBounds().getWidth(), (int) getCollisionDetector().getBounds().getHeight());
+            Rectangle newDetector = new Rectangle((int) getX(), (int) getY(), (int) getCollisionDetector().getBounds().getWidth(), (int) getCollisionDetector().getBounds().getHeight());
             //System.out.println(newDetector.getX() + " " + newDetector.getY() + " " + ((Rectangle) w.getCollisionDetector()).getX() + ((Rectangle) w.getCollisionDetector()).getY());
-            if(newDetector.intersects((Rectangle) w.getCollisionDetector())){
+            if(newDetector.intersects((Rectangle) wall.getCollisionDetector())){
                 return true;
             }
 
@@ -85,12 +96,13 @@ public class Crewmate extends GameObject {
         return false;
     }
 
-    public synchronized void changeDirection(Directions d){
+    public synchronized void changeDirection(Directions direction){
 
-        directions = d;
+        directions = direction;
 
     }
 
+    //Change which part of the animation the sprite is in
     public synchronized void addSpriteNum(){
 
         if(moving) {

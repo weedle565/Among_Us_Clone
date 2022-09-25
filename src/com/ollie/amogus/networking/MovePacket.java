@@ -5,7 +5,7 @@ import com.ollie.amogus.gameobjects.entities.Directions;
 public class MovePacket extends Packet {
 
     private String username;
-    private int x, y;
+    private float x, y;
 
     private boolean moving;
     private int directions;
@@ -15,13 +15,13 @@ public class MovePacket extends Packet {
 
         String[] dataArray = readData(data).split(",");
         this.username = dataArray[0];
-        this.x = Integer.parseInt(dataArray[1]);
-        this.y = Integer.parseInt(dataArray[2]);
-        this.moving = Integer.parseInt(dataArray[3]) == 1;
+        this.x = Float.parseFloat(dataArray[1]);
+        this.y = Float.parseFloat(dataArray[2]);
+        this.moving = Float.parseFloat(dataArray[3]) == 1;
         this.directions = Integer.parseInt(dataArray[4]);
     }
 
-    public MovePacket(String username, int x, int y, boolean moving, int directions) {
+    public MovePacket(String username, float x, float y, boolean moving, int directions) {
         super(02);
         this.username = username;
         this.x = x;
@@ -52,11 +52,11 @@ public class MovePacket extends Packet {
         return username;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 

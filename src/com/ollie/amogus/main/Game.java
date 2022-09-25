@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class Game extends Canvas implements Runnable {
 
     private Crewmate crew;
-    private Map b;
+    private Map map;
 
     private final ArrayList<Wall> walls;
 
@@ -53,19 +53,22 @@ public class Game extends Canvas implements Runnable {
 
     public void init() throws IOException {
 
+        //Add a new crewmate and ask its username.
         crew = new MPCrewMate(512, 600, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
 
-        b = new Map(-1400, -70);
-        b.addCrewMate(crew);
+        map = new Map(-1400, -70);
+        map.addCrewMate(crew);
 
         addKeyListener(new KeyInput());
 
+        //Create a new login packet to login to any existing server
         LoginPacket lP = new LoginPacket(crew.getUserName(), crew.getX(), crew.getY());
         if(server != null) {
             server.addConnection((MPCrewMate) crew, lP);
 
         }
 
+        //Write the login data to the server
         lP.writeData(client);
 
         initWalls();
@@ -85,11 +88,13 @@ public class Game extends Canvas implements Runnable {
         thread = new Thread(this);
         thread.start();
 
+        //Ask if the current player wants to run a new server
         if(JOptionPane.showConfirmDialog(this, "Do you want to run the server") == 0){
             server = new GameServer(this);
             server.start();
         }
 
+        //Start the game client on the computers local network
         client = new GameClient(this, InetAddress.getLocalHost().getHostAddress());
         client.start();
         System.out.println("client started");
@@ -97,6 +102,7 @@ public class Game extends Canvas implements Runnable {
 
     public synchronized void kill(){
 
+        //Close the game
         try{
             thread.join();
             playing = false;
@@ -114,9 +120,11 @@ public class Game extends Canvas implements Runnable {
             e.printStackTrace();
         }
 
+        //Updates are used to render animations and I found 6 times a second was ideal for smoothness
         final int targetUpdates = 6;
         final double targetUpdateTime = 1000000000/targetUpdates;
 
+        //Target 60 frames per second
         final int targetFPS = 60;
         final double targetTime = 1000000000/targetFPS;
 
@@ -125,6 +133,7 @@ public class Game extends Canvas implements Runnable {
         int frames = 0, ticks = 0;
         long timer = System.currentTimeMillis();
 
+        //Main game loop.
         while(playing){
 
             long now = System.nanoTime();
@@ -154,13 +163,17 @@ public class Game extends Canvas implements Runnable {
                 deltaF--;
             }
 
+            /*
+                Print current FPS
+                @TODO Change this to being in the title of the frame.
+             */
             if(System.currentTimeMillis() - timer > 1000){
                 System.out.printf("UPS: %s, FPS: %s%n", ticks, frames);
                 frames = 0;
                 ticks = 0;
                 timer += 1000;
 
-                System.out.println(b.getCrewmates());
+                System.out.println(map.getCrewmates());
             }
 
         }
@@ -169,36 +182,42 @@ public class Game extends Canvas implements Runnable {
 
     }
 
+    //Move the player
     private synchronized void move(){
 
         if(up && left) {
             if(crew.checkCollisions(-1, -1)) return;
             crew.updatePos(1, 1);
-            b.updatePos(-1, -1);
+            map.updatePos(-1, -1);
         }
         else if(up && right) {
             if(crew.checkCollisions(1, -1)) return;
             crew.updatePos(-1, 1);
-            b.updatePos(1, -1);
+            map.updatePos(1, -1);
         }
         else if(down && left) {
             if(crew.checkCollisions(-1, 1)) return;
             crew.updatePos(1, -1);
-            b.updatePos(-1, 1);
+            map.updatePos(-1, 1);
         }
         else if(down && right) {
             if(crew.checkCollisions(1, 1)) return;
             crew.updatePos(-1, -1);
-            b.updatePos(1, 1);
+            map.updatePos(1, 1);
         } else if(up) {
             if(crew.checkCollisions(0, -2)) return;
             crew.updatePos(0, 2);
-            b.updatePos(0, -2);
+            map.updatePos(0, -2);
+        } else if(down) {
+            crew.updatePos(0, -2);
+            map.updatePos(0, 2);
+        } else if(left) {
+            crew.updatePos(2, 0);
+            map.updatePos(-2, 0);
+        } else if(right) {
+            crew.updatePos(-2, 0);
+            map.updatePos(2, 0);
         }
-
-        else if(down) b.updatePos(0, 2);
-        else if(left) b.updatePos(-2, 0);
-        else if(right) b.updatePos(2, 0);
 
         if(right) crew.changeDirection(Directions.LEFT);
         else if(left) crew.changeDirection(Directions.RIGHT);
@@ -213,6 +232,11 @@ public class Game extends Canvas implements Runnable {
 
         BufferStrategy bs = this.getBufferStrategy();
 
+        /*
+            Create a buffer strategy to avoid tearing and seeing redraws happen in real time. (Prepare redraws underneath
+            the current frame and then draws from that)
+        */
+
         if(bs == null){
             this.createBufferStrategy(3, ge);
             return;
@@ -220,11 +244,14 @@ public class Game extends Canvas implements Runnable {
 
         Graphics g = bs.getDrawGraphics();
 
+        //Do i need this anymore?
+        //@TODO test removing this line.
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        b.drawImage(g);
-        b.render(g);
+        map.drawImage(g);
+        crew.drawImage(g);
+        map.render(g, crew);
 
         walls.iterator().forEachRemaining(w -> w.drawImage(g));
 
@@ -241,8 +268,8 @@ public class Game extends Canvas implements Runnable {
 
     }
 
-    public Map getB() {
-        return b;
+    public Map getMap() {
+        return map;
     }
 
     public Crewmate getCrew() {
