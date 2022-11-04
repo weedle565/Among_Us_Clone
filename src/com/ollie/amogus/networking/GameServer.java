@@ -18,6 +18,7 @@ public class GameServer extends Thread {
     private List<MPCrewMate> players = new ArrayList<>();
 
     public GameServer(Game g){
+
         this.g = g;
 
         try{
@@ -38,6 +39,7 @@ public class GameServer extends Thread {
                 e.printStackTrace();
             }
             parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
+
         }
     }
 
@@ -150,6 +152,7 @@ public class GameServer extends Thread {
             crew.setMoving(p.isMoving());
             crew.changeDirection(p.getDirections());
             p.writeData(this);
+
         }
     }
 

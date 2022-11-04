@@ -9,6 +9,8 @@ public class Frame {
 
     private static Game g;
 
+    private static JFrame mainFrame = new JFrame();
+
     public Frame(){
         try{
             g = new Game();
@@ -16,7 +18,6 @@ public class Frame {
             e.printStackTrace();
         }
 
-        JFrame mainFrame = new JFrame();
         mainFrame.setTitle("Amog");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.add(g);
@@ -33,6 +34,10 @@ public class Frame {
 
     public static Game getG() {
         return g;
+    }
+
+    public static JFrame getMainFrame() {
+        return mainFrame;
     }
 
     public static void main(String[] args) {

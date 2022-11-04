@@ -62,25 +62,6 @@ public class Crewmate extends GameObject {
          g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
     }
 
-    /*
-        Update the position of the crewmate on anothers screen, as the crewmates real x and y never changes we need
-        to work out where the crewmate should be on anothers screen, thus we use fake x and fake y.
-        The movement is halfed as for some reason during testing the movement would be twice as fast as actuality over
-        the network. On move, send a new move packet to the network with the fake x and y to update the position for other
-        players
-        @TODO Change directions.ordinal to getting a direction
-
-     */
-    @Override
-    public synchronized void updatePos(float x, float y){
-
-        setFakeX(x/5f);
-        setFakeY(y/5f);
-
-        MovePacket mp = new MovePacket(getUserName(), getFakeX(), getFakeY(), true, directions.ordinal());
-        mp.writeData(Frame.getG().getClient());
-    }
-
     public synchronized boolean checkCollisions(int x, int y){
 
         for(Wall wall : Frame.getG().getWalls()){
@@ -109,6 +90,17 @@ public class Crewmate extends GameObject {
             if ((displayNum + 1) < 4) displayNum++;
             else displayNum = 0;
         }
+    }
+
+    public synchronized void updatePos(float x, float y) {
+
+        //if(com.ollie.amogus.main.Frame.getG().getCrew().checkCollisions((int) x, (int) y)) return;
+
+        setX(x);
+        setY(y);
+
+        MovePacket mp = new MovePacket(getUserName(), getX(), getY(), true, directions.ordinal());
+        mp.writeData(Frame.getG().getClient());
     }
 
     public void setMoving(boolean moving){

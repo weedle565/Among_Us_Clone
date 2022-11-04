@@ -3,14 +3,11 @@ package com.ollie.amogus.gameobjects;
 import com.ollie.amogus.gameobjects.entities.Crewmate;
 import com.ollie.amogus.gameobjects.entities.Directions;
 import com.ollie.amogus.gameobjects.entities.MPCrewMate;
-import com.ollie.amogus.main.Frame;
-import com.ollie.amogus.networking.MovePacket;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -37,14 +34,6 @@ public class Map {
     /*
         When moving we move the background instead of the crewmate to allow for easier and smoother movement.
      */
-    public synchronized void updatePos(int x, int y) {
-
-        if(com.ollie.amogus.main.Frame.getG().getCrew().checkCollisions(x, y)) return;
-
-        setX(x);
-        setY(y);
-
-    }
 
     //Adds a new crewmate to the map
     public synchronized void addCrewMate(Crewmate c){
@@ -52,12 +41,9 @@ public class Map {
     }
 
     //Renders all crewmates on the map, used for rendering everything connected to the server
-    public void render(Graphics g, Crewmate currentClientCrew){
+    public void render(Graphics g){
         for(Crewmate crewmate : crewmates){
-
-            if(!crewmate.getUserName().equals(currentClientCrew.getUserName())) {
-                crewmate.drawImage(g);
-            }
+            crewmate.drawImage(g);
         }
     }
 
@@ -79,11 +65,14 @@ public class Map {
     public synchronized void moveCrewmates(String username, float x, float y, Directions movingDir){
 
         int i = getCrewmateIndex(username);
-        MPCrewMate crewmate = (MPCrewMate) crewmates.get(i);
+        MPCrewMate crewmate;
 
-        crewmate.setNewX(x);
-        crewmate.setNewY(y);
-        crewmate.changeDirection(movingDir);
+        try {
+             crewmate = (MPCrewMate) crewmates.get(i);
+             crewmate.setNewX(x);
+             crewmate.setNewY(y);
+             crewmate.changeDirection(movingDir);
+        } catch (Exception ignore){};
 
     }
 

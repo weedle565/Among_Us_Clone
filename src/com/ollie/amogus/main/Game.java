@@ -185,38 +185,30 @@ public class Game extends Canvas implements Runnable {
     //Move the player
     private synchronized void move(){
 
-        if(up && left) {
+        if(down && right) {
             if(crew.checkCollisions(-1, -1)) return;
-            crew.updatePos(1, 1);
-            map.updatePos(-1, -1);
-        }
-        else if(up && right) {
-            if(crew.checkCollisions(1, -1)) return;
-            crew.updatePos(-1, 1);
-            map.updatePos(1, -1);
+            crew.updatePos(-1, -1);
         }
         else if(down && left) {
-            if(crew.checkCollisions(-1, 1)) return;
+            if(crew.checkCollisions(1, -1)) return;
             crew.updatePos(1, -1);
-            map.updatePos(-1, 1);
         }
-        else if(down && right) {
+        else if(up && right) {
+            if(crew.checkCollisions(-1, 1)) return;
+            crew.updatePos(-1, 1);
+        }
+        else if(up && left) {
             if(crew.checkCollisions(1, 1)) return;
-            crew.updatePos(-1, -1);
-            map.updatePos(1, 1);
-        } else if(up) {
-            if(crew.checkCollisions(0, -2)) return;
-            crew.updatePos(0, 2);
-            map.updatePos(0, -2);
+            crew.updatePos(1, 1);
         } else if(down) {
+            if(crew.checkCollisions(0, -2)) return;
             crew.updatePos(0, -2);
-            map.updatePos(0, 2);
-        } else if(left) {
-            crew.updatePos(2, 0);
-            map.updatePos(-2, 0);
+        } else if(up) {
+            crew.updatePos(0, 2);
         } else if(right) {
             crew.updatePos(-2, 0);
-            map.updatePos(2, 0);
+        } else if(left) {
+            crew.updatePos(2, 0);
         }
 
         if(right) crew.changeDirection(Directions.LEFT);
@@ -251,7 +243,7 @@ public class Game extends Canvas implements Runnable {
 
         map.drawImage(g);
         crew.drawImage(g);
-        map.render(g, crew);
+        map.render(g);
 
         walls.iterator().forEachRemaining(w -> w.drawImage(g));
 
