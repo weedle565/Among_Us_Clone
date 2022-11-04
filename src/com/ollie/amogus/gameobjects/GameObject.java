@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 public abstract class GameObject {
 
-    private float x, y, fakeX, fakeY;
+    private float x, y;
     private final Shape collisionDetector;
 
     private BufferedImage[] sprites;
@@ -13,8 +13,6 @@ public abstract class GameObject {
     public GameObject(float x, float y, int sprites, Rectangle collisionDetector) {
         this.x = x;
         this.y = y;
-        this.fakeX = x;
-        this.fakeY = y;
         this.sprites = new BufferedImage[sprites];
         this.collisionDetector = collisionDetector;
     }
@@ -41,22 +39,6 @@ public abstract class GameObject {
 
     public float getY() {
         return y;
-    }
-
-    public float getFakeX() {
-        return fakeX;
-    }
-
-    public float getFakeY() {
-        return fakeY;
-    }
-
-    public void setFakeX(float fakeX) {
-        this.fakeX += fakeX;
-    }
-
-    public void setFakeY(float fakeY) {
-        this.fakeY += fakeY;
     }
 
     public void addSprites(BufferedImage[] sprites){

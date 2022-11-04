@@ -15,6 +15,8 @@ public class GameClient extends Thread {
     public GameClient(Game g, String ip){
         this.g = g;
 
+        this.setName("Client Thread");
+
         try{
             socket = new DatagramSocket();
             ipAddress = InetAddress.getByName(ip);
@@ -54,13 +56,11 @@ public class GameClient extends Thread {
                 p = new LoginPacket(data);
                 handleLogin((LoginPacket) p, address, port);
                 break;
-
             case DISCONNECT:
                 p = new DisconnectPacket(data);
                 System.out.println("[" + address.getHostAddress() + ":" + port + "] "
                         + ((DisconnectPacket) p).getUsername() + " has left the world...");
                 break;
-
             case MOVE:
                 p = new MovePacket(data);
                 handleMove((MovePacket) p);

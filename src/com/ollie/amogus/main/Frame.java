@@ -9,6 +9,8 @@ public class Frame {
 
     private static Game g;
 
+    private static final JFrame mainFrame = new JFrame();
+
     public Frame(){
         try{
             g = new Game();
@@ -16,7 +18,7 @@ public class Frame {
             e.printStackTrace();
         }
 
-        JFrame mainFrame = new JFrame();
+
         mainFrame.setTitle("Amog");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.add(g);
@@ -29,6 +31,10 @@ public class Frame {
         } catch (UnknownHostException e){
             e.printStackTrace();
         }
+    }
+
+    public static JFrame getMainFrame() {
+        return mainFrame;
     }
 
     public static Game getG() {

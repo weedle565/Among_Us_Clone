@@ -20,6 +20,8 @@ public class GameServer extends Thread {
     public GameServer(Game g){
         this.g = g;
 
+        this.setName("Server Name");
+
         try{
             socket = new DatagramSocket(1331);
         } catch (SocketException e){
@@ -145,8 +147,8 @@ public class GameServer extends Thread {
         if(getMPCrew(p.getUsername()) != null){
             int index = getCrewMPIndex(p.getUsername());
             MPCrewMate crew = players.get(index);
-            crew.setNewX(p.getX());
-            crew.setNewY(p.getY());
+            //crew.setNewX(p.getX());
+            //crew.setNewY(p.getY());
             crew.setMoving(p.isMoving());
             crew.changeDirection(p.getDirections());
             p.writeData(this);

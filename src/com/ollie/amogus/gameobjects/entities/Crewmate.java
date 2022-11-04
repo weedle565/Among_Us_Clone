@@ -15,7 +15,9 @@ public class Crewmate extends GameObject {
     private boolean isImposter;
     private boolean moving;
 
-    private String userName;
+    private float rx, ry;
+
+    private final String userName;
 
     private int displayNum;
     private int modifier;
@@ -24,6 +26,9 @@ public class Crewmate extends GameObject {
 
     public Crewmate(float x, float y, String userName) {
         super(x, y, 4, new Rectangle((int) x, (int) y, 48, 48));
+
+        rx = 0;
+        ry = 0;
 
         this.userName = userName;
 
@@ -58,7 +63,7 @@ public class Crewmate extends GameObject {
         if(directions == Directions.LEFT) modifier = 4;
         else if (directions == Directions.RIGHT) modifier = 0;
 
-         g.drawImage((Image) super.getSprites()[displayNum + modifier], (int) getX(), (int) getY(), super.getSprites()[displayNum + modifier].getWidth()*3,super.getSprites()[displayNum + modifier].getHeight()*3, null);
+         g.drawImage(super.getSprites()[displayNum + modifier], (int) getX(), (int) getY(), super.getSprites()[displayNum + modifier].getWidth()*3,super.getSprites()[displayNum + modifier].getHeight()*3, null);
          g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
     }
 
@@ -74,10 +79,10 @@ public class Crewmate extends GameObject {
     @Override
     public synchronized void updatePos(float x, float y){
 
-        setFakeX(x/5f);
-        setFakeY(y/5f);
+        rx += x;
+        ry += y;
 
-        MovePacket mp = new MovePacket(getUserName(), getFakeX(), getFakeY(), true, directions.ordinal());
+        MovePacket mp = new MovePacket(getUserName(), rx, ry, true, directions.ordinal());
         mp.writeData(Frame.getG().getClient());
     }
 
@@ -118,6 +123,14 @@ public class Crewmate extends GameObject {
 
         this.moving = moving;
 
+    }
+
+    public float getRx() {
+        return rx;
+    }
+
+    public float getRy() {
+        return ry;
     }
 
     public String getUserName() {

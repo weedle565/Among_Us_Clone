@@ -56,7 +56,7 @@ public class Game extends Canvas implements Runnable {
         //Add a new crewmate and ask its username.
         crew = new MPCrewMate(512, 600, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
 
-        map = new Map(-1400, -70);
+        map = new Map(-1400, -70, this);
         map.addCrewMate(crew);
 
         addKeyListener(new KeyInput());
@@ -85,7 +85,7 @@ public class Game extends Canvas implements Runnable {
 
     public synchronized void start() throws UnknownHostException {
 
-        thread = new Thread(this);
+        thread = new Thread(this, "Main Game Thread");
         thread.start();
 
         //Ask if the current player wants to run a new server
@@ -122,11 +122,11 @@ public class Game extends Canvas implements Runnable {
 
         //Updates are used to render animations and I found 6 times a second was ideal for smoothness
         final int targetUpdates = 6;
-        final double targetUpdateTime = 1000000000/targetUpdates;
+        final double targetUpdateTime = 1000000000f/targetUpdates;
 
         //Target 60 frames per second
         final int targetFPS = 60;
-        final double targetTime = 1000000000/targetFPS;
+        final double targetTime = 1000000000f/targetFPS;
 
         long lastTime = System.nanoTime();
         double deltaF = 0, deltaU = 0;
@@ -165,15 +165,15 @@ public class Game extends Canvas implements Runnable {
 
             /*
                 Print current FPS
-                @TODO Change this to being in the title of the frame.
              */
             if(System.currentTimeMillis() - timer > 1000){
-                System.out.printf("UPS: %s, FPS: %s%n", ticks, frames);
+
+                Frame.getMainFrame().setTitle("Amogus! FPS: " + frames + " Ticks: " + ticks);
+
                 frames = 0;
                 ticks = 0;
                 timer += 1000;
 
-                System.out.println(map.getCrewmates());
             }
 
         }
@@ -187,7 +187,7 @@ public class Game extends Canvas implements Runnable {
 
         if(up && left) {
             if(crew.checkCollisions(-1, -1)) return;
-            crew.updatePos(1, 1);
+            crew.updatePos(1f/2, 1f/2);
             map.updatePos(-1, -1);
         }
         else if(up && right) {
