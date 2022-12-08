@@ -149,8 +149,8 @@ public class GameServer extends Thread {
         if(getMPCrew(p.getUsername()) != null){
             int index = getCrewMPIndex(p.getUsername());
             MPCrewMate crew = players.get(index);
-            //crew.setNewX(p.getX());
-            //crew.setNewY(p.getY());
+            crew.setNewX(p.getX());
+            crew.setNewY(p.getY());
             crew.setMoving(p.isMoving());
             crew.changeDirection(p.getDirections());
             p.writeData(this);
