@@ -17,18 +17,22 @@ import java.util.Objects;
 
 public class Map {
 
-    private ArrayList<Crewmate> crewmates = new ArrayList<>();
-    private BufferedImage backImage;
+    private final ArrayList<Crewmate> crewmates = new ArrayList<>();
+    private final BufferedImage backImage;
     int x, y;
+    private final Crewmate localCrewmate;
 
     private Game g;
+    private int counter;
 
-    public Map(int x, int y, Game g) throws IOException {
+    public Map(int x, int y, Game g, Crewmate localCrewmate) throws IOException {
 
         this.g = g;
+        this.localCrewmate = localCrewmate;
 
         this.x = x;
         this.y = y;
+        this.counter = 1;
         backImage = ImageIO.read(Objects.requireNonNull(Map.class.getResource("/resoures/map.png")));
     }
 
@@ -50,15 +54,37 @@ public class Map {
     }
 
     public synchronized void addCrewMate(Crewmate c){
+
+        if (getCrewmateIndex(c.getUserName()) >= 0) return;
+
         c.setNewX(512 - g.getCrew().getRx());
         c.setNewY(600 - g.getCrew().getRy());
 
-        System.out.println(c.getX() + " " + c.getY() + " " + g.getCrew().getRx() + " " + g.getCrew().getRy());
-
         crewmates.add(c);
+
     }
 
-    public void render(Graphics g, Crewmate crewmate){
+    public synchronized void checkIfInGame(Crewmate crew) {
+
+        if (getCrewmateIndex(crew.getUserName()) == -1) {
+            System.out.println(crew.getUserName() + " Has been added to the game!");
+            addCrewMate(crew);
+        }
+
+    }
+
+    public synchronized void removeCrewmate(String username) {
+
+        crewmates.get(getCrewmateIndex(username)).updatePos(10000, 10000);
+
+        crewmates.remove(getCrewmateIndex(username));
+        g.repaint();
+        System.gc();
+
+    }
+
+    public synchronized void render(Graphics g){
+//        System.out.println(crewmates.size());
         for(Crewmate c : crewmates){
             c.drawImage(g);
         }
@@ -67,33 +93,39 @@ public class Map {
     private int getCrewmateIndex(String username){
 
         int i = 0;
+        boolean found = false;
         for(Crewmate c : crewmates){
-            if(c instanceof MPCrewMate && c.getUserName().equals(username))
+            if(c instanceof MPCrewMate && c.getUserName().equals(username)) {
+                found = true;
                 break;
+            }
 
             i++;
         }
 
-        return i;
+        return found ? i : -1;
 
     }
 
     public synchronized void moveCrewmates(String username, float x, float y, Directions movingDir){
 
+        if (Objects.equals(username, localCrewmate.getUserName())) return;
+
         for(Crewmate m : crewmates) {
 
             MPCrewMate crewmate = (MPCrewMate) m;
 
-            if (g.getCrew().getUserName().equals(username)) {
+            if (!g.getCrew().getUserName().equals(username) && Objects.equals(m.getUserName(), username)) {
+
+                if (counter % 10 == 0) {
+                    crewmate.addSpriteNum(true);
+                }
 
                 crewmate.changeDirection(movingDir);
+                crewmate.setNewX(x);
+                crewmate.setNewY(y);
 
-                System.out.println(x + " " + y + " " + crewmate.getRx() + " " + crewmate.getRy());
-            } else {
-                crewmate.setNewX(x - 512);
-                crewmate.setNewY(y - 600);
-
-                System.out.println(crewmate.getX() + " " + crewmate.getY() + " " + x + " " + y);
+                counter++;
             }
         }
 

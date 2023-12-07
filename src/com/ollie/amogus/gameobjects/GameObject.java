@@ -13,6 +13,7 @@ public abstract class GameObject {
     public GameObject(float x, float y, int sprites, Rectangle collisionDetector) {
         this.x = x;
         this.y = y;
+
         this.sprites = new BufferedImage[sprites];
         this.collisionDetector = collisionDetector;
     }
@@ -40,6 +41,7 @@ public abstract class GameObject {
     public float getY() {
         return y;
     }
+
 
     public void addSprites(BufferedImage[] sprites){
         this.sprites = sprites;

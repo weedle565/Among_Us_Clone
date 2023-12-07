@@ -1,5 +1,6 @@
 package com.ollie.amogus.networking;
 
+import com.ollie.amogus.gameobjects.entities.Directions;
 import com.ollie.amogus.gameobjects.entities.MPCrewMate;
 import com.ollie.amogus.main.Game;
 
@@ -73,6 +74,9 @@ public class GameServer extends Thread {
             case MOVE:
                 p = new MovePacket(data);
                 handleMove((MovePacket) p);
+            case REPLY:
+                p = new ReplyLoginPacket(data);
+                sendToAllClients(p.getData());
         }
 
     }
@@ -149,10 +153,6 @@ public class GameServer extends Thread {
         if(getMPCrew(p.getUsername()) != null){
             int index = getCrewMPIndex(p.getUsername());
             MPCrewMate crew = players.get(index);
-            crew.setNewX(p.getX());
-            crew.setNewY(p.getY());
-            crew.setMoving(p.isMoving());
-            crew.changeDirection(p.getDirections());
             p.writeData(this);
 
         }

@@ -1,27 +1,40 @@
 package com.ollie.amogus.networking;
 
-public class LoginPacket extends Packet {
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+public class ReplyLoginPacket extends Packet {
 
     private final String username;
     private final float x;
     private final float y;
+    private final String ip;
+    private final int port;
 
-    public LoginPacket(byte[] data){
-        super(0x00);
+    public ReplyLoginPacket(byte[] data){
+        super(0x03);
 
         String[] dataArray = readData(data).split(",");
         this.username = dataArray[0];
         this.x = Float.parseFloat(dataArray[1]);
         this.y = Float.parseFloat(dataArray[2]);
+        this.ip = dataArray[3];
+
+        this.port = Integer.parseInt(dataArray[4]);
+
 
     }
 
-    public LoginPacket(String username, float x, float y){
-        super(0x00);
+    public ReplyLoginPacket(float x, float y, String username, String ip, int port){
+        super(0x03);
 
-        this.username = username;
         this.x = x;
         this.y = y;
+        this.username = username;
+        this.ip = ip;
+
+        this.port = port;
+
     }
 
     @Override
@@ -37,7 +50,7 @@ public class LoginPacket extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("00" + this.username + "," + getX() + "," + getY()).getBytes();
+        return ("03" + this.username + "," + getX() + "," + getY() + "," + getIp() + "," + getPort()).getBytes();
     }
 
     public String getUsername() {
@@ -50,5 +63,13 @@ public class LoginPacket extends Packet {
 
     public float getY() {
         return y;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
     }
 }

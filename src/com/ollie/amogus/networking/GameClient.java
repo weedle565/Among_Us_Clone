@@ -1,10 +1,14 @@
 package com.ollie.amogus.networking;
 
+import com.ollie.amogus.gameobjects.entities.Crewmate;
+import com.ollie.amogus.gameobjects.entities.Directions;
 import com.ollie.amogus.gameobjects.entities.MPCrewMate;
 import com.ollie.amogus.main.Game;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class GameClient extends Thread {
 
@@ -41,7 +45,7 @@ public class GameClient extends Thread {
         }
     }
 
-    private void parsePacket(byte[] data, InetAddress address, int port){
+    private void parsePacket(byte[] data, InetAddress address, int port) {
 
         //Recieve the packet and work out what to do with it (ignore anything that isnt 00-002
         String msg = new String(data).trim();
@@ -60,10 +64,15 @@ public class GameClient extends Thread {
                 p = new DisconnectPacket(data);
                 System.out.println("[" + address.getHostAddress() + ":" + port + "] "
                         + ((DisconnectPacket) p).getUsername() + " has left the world...");
+                handleDisconnect((DisconnectPacket) p);
                 break;
             case MOVE:
                 p = new MovePacket(data);
                 handleMove((MovePacket) p);
+                break;
+            case REPLY:
+                p = new ReplyLoginPacket(data);
+                handleReply((ReplyLoginPacket) p);
         }
 
     }
@@ -79,16 +88,37 @@ public class GameClient extends Thread {
     }
 
     //On login, add a new crewmate to the map on the client and post a message in the console.
-    private void handleLogin(LoginPacket p, InetAddress address, int port){
+    private void handleLogin(LoginPacket p, InetAddress address, int port) {
         System.out.println("[" + address.getHostAddress() + ":" + port + "] " + p.getUsername()
                 + " has joined the game...");
         MPCrewMate crew = new MPCrewMate(p.getX(), p.getY(), p.getUsername(), address, port);
         g.getMap().addCrewMate(crew);
+
+        ReplyLoginPacket replyLoginPacket = new ReplyLoginPacket(p.getX(), p.getY(), p.getUsername(), address.getHostName(), port);
+        replyLoginPacket.writeData(this);
+
+
+    }
+
+    private void handleDisconnect(DisconnectPacket p) {
+        g.getMap().removeCrewmate(p.getUsername());
     }
 
     //Move another player on everyone elses clients
     private void handleMove(MovePacket p){
+        System.out.println(p.isMoving());
         g.getMap().moveCrewmates(p.getUsername(), p.getX(), p.getY(), p.getDirections());
+    }
+
+    private void handleReply(ReplyLoginPacket p) {
+        if (!Objects.equals(g.getCrew().getUserName(), p.getUsername())) {
+            try {
+                MPCrewMate newCrew = new MPCrewMate(p.getX(), p.getY(), p.getUsername(), InetAddress.getByName(p.getIp()), p.getPort());
+                g.getMap().checkIfInGame(newCrew);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public Game getG() {

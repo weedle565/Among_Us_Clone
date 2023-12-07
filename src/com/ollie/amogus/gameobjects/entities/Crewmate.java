@@ -5,6 +5,7 @@ import com.ollie.amogus.gameobjects.Wall;
 import com.ollie.amogus.imagehandling.MirrorHandler;
 import com.ollie.amogus.imagehandling.SpriteSheetLoader;
 import com.ollie.amogus.main.Frame;
+import com.ollie.amogus.networking.DisconnectPacket;
 import com.ollie.amogus.networking.MovePacket;
 
 import java.awt.*;
@@ -60,11 +61,12 @@ public class Crewmate extends GameObject {
     @Override
     public synchronized void drawImage(Graphics g) {
 
+
         if(directions == Directions.LEFT) modifier = 4;
         else if (directions == Directions.RIGHT) modifier = 0;
 
          g.drawImage(super.getSprites()[displayNum + modifier], (int) getX(), (int) getY(), super.getSprites()[displayNum + modifier].getWidth()*3,super.getSprites()[displayNum + modifier].getHeight()*3, null);
-         g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
+         //g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
     }
 
     /*
@@ -78,11 +80,10 @@ public class Crewmate extends GameObject {
      */
     @Override
     public synchronized void updatePos(float x, float y){
+        setX(x);
+        setY(y);
 
-        rx += x;
-        ry += y;
-
-        MovePacket mp = new MovePacket(getUserName(), rx, ry, true, directions.ordinal());
+        MovePacket mp = new MovePacket(getUserName(), getX(), getY(), moving, directions.getNum());
         mp.writeData(Frame.getG().getClient());
     }
 
@@ -104,16 +105,21 @@ public class Crewmate extends GameObject {
     public synchronized void changeDirection(Directions direction){
 
         directions = direction;
+//        System.out.println(directions);
 
     }
 
     //Change which part of the animation the sprite is in
-    public synchronized void addSpriteNum(){
+    public synchronized void addSpriteNum(boolean newClient){
 
-        if(moving) {
+        if(moving || newClient) {
             if ((displayNum + 1) < 4) displayNum++;
             else displayNum = 0;
         }
+    }
+
+    public boolean getMoving() {
+        return moving;
     }
 
     public void setMoving(boolean moving){

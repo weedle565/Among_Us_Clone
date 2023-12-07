@@ -11,7 +11,7 @@ public class MovePacket extends Packet {
     private int directions;
 
     public MovePacket(byte[] data) {
-        super(02);
+        super(0x02);
 
         String[] dataArray = readData(data).split(",");
         this.username = dataArray[0];
@@ -22,7 +22,7 @@ public class MovePacket extends Packet {
     }
 
     public MovePacket(String username, float x, float y, boolean moving, int directions) {
-        super(02);
+        super(0x02);
         this.username = username;
         this.x = x;
         this.y = y;
@@ -66,10 +66,10 @@ public class MovePacket extends Packet {
 
     public Directions getDirections() {
         return switch (directions) {
-            case 1 -> Directions.LEFT;
+            case 1 -> Directions.FORWARD;
             case 2 -> Directions.BACK;
-            case 3 -> Directions.RIGHT;
-            default -> Directions.FORWARD;
+            case 3 -> Directions.LEFT;
+            default -> Directions.RIGHT;
         };
     }
 }

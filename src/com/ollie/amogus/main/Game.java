@@ -56,7 +56,7 @@ public class Game extends Canvas implements Runnable {
         //Add a new crewmate and ask its username.
         crew = new MPCrewMate(512, 600, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
 
-        map = new Map(-1400, -70, this);
+        map = new Map(-1400, -70, this, crew);
         map.addCrewMate(crew);
 
         addKeyListener(new KeyInput());
@@ -185,42 +185,26 @@ public class Game extends Canvas implements Runnable {
     //Move the player
     private synchronized void move(){
 
-        if(up && left) {
-            if(crew.checkCollisions(-1, -1)) return;
-            crew.updatePos(1f/2, 1f/2);
-            map.updatePos(-1, -1);
-        }
-        else if(up && right) {
-            if(crew.checkCollisions(1, -1)) return;
-            crew.updatePos(-1, 1);
-            map.updatePos(1, -1);
-        }
-        else if(down && left) {
-            if(crew.checkCollisions(-1, 1)) return;
-            crew.updatePos(1, -1);
-            map.updatePos(-1, 1);
-        }
-        else if(down && right) {
-            if(crew.checkCollisions(1, 1)) return;
+        if (up && left) {
             crew.updatePos(-1, -1);
-            map.updatePos(1, 1);
-        } else if(up) {
-            if(crew.checkCollisions(0, -2)) return;
-            crew.updatePos(0, 2);
-            map.updatePos(0, -2);
-        } else if(down) {
+        } else if (up && right) {
+            crew.updatePos(1, -1);
+        } else if (down && left) {
+            crew.updatePos(-1, 1);
+        } else if (down && right) {
+            crew.updatePos(1, 1);
+        } else if (up) {
             crew.updatePos(0, -2);
-            map.updatePos(0, 2);
-        } else if(left) {
-            crew.updatePos(2, 0);
-            map.updatePos(-2, 0);
-        } else if(right) {
+        } else if (down) {
+            crew.updatePos(0, 2);
+        } else if (left) {
             crew.updatePos(-2, 0);
-            map.updatePos(2, 0);
+        } else if (right) {
+            crew.updatePos(2, 0);
         }
 
-        if(right) crew.changeDirection(Directions.LEFT);
-        else if(left) crew.changeDirection(Directions.RIGHT);
+        if(left) crew.changeDirection(Directions.LEFT);
+        else if(right) crew.changeDirection(Directions.RIGHT);
 
         crew.setMoving(up || left || right || down);
 
@@ -251,7 +235,7 @@ public class Game extends Canvas implements Runnable {
 
         map.drawImage(g);
         crew.drawImage(g);
-        map.render(g, crew);
+        map.render(g);
 
         walls.iterator().forEachRemaining(w -> w.drawImage(g));
 
@@ -261,7 +245,7 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void animate(){
-        crew.addSpriteNum();
+        crew.addSpriteNum(false);
     }
 
     private void tick(){
@@ -284,17 +268,17 @@ public class Game extends Canvas implements Runnable {
 
         @Override
         public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_A) right = false;
-            if (e.getKeyCode() == KeyEvent.VK_D) left = false;
-            if (e.getKeyCode() == KeyEvent.VK_W) down = false;
-            if (e.getKeyCode() == KeyEvent.VK_S) up = false;
+            if (e.getKeyCode() == KeyEvent.VK_A) left = false;
+            if (e.getKeyCode() == KeyEvent.VK_D) right = false;
+            if (e.getKeyCode() == KeyEvent.VK_W) up = false;
+            if (e.getKeyCode() == KeyEvent.VK_S) down = false;
         }
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_A) right = true;
-            if (e.getKeyCode() == KeyEvent.VK_D) left = true;
-            if (e.getKeyCode() == KeyEvent.VK_W) down = true;
-            if (e.getKeyCode() == KeyEvent.VK_S) up = true;
+            if (e.getKeyCode() == KeyEvent.VK_A) left = true;
+            if (e.getKeyCode() == KeyEvent.VK_D) right = true;
+            if (e.getKeyCode() == KeyEvent.VK_W) up = true;
+            if (e.getKeyCode() == KeyEvent.VK_S) down = true;
         }
     }
 
