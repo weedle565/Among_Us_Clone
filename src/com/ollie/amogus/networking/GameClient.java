@@ -106,7 +106,6 @@ public class GameClient extends Thread {
 
     //Move another player on everyone elses clients
     private void handleMove(MovePacket p){
-        System.out.println(p.isMoving());
         g.getMap().moveCrewmates(p.getUsername(), p.getX(), p.getY(), p.getDirections());
     }
 

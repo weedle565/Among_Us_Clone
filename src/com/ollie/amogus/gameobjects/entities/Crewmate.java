@@ -7,6 +7,7 @@ import com.ollie.amogus.imagehandling.SpriteSheetLoader;
 import com.ollie.amogus.main.Frame;
 import com.ollie.amogus.networking.DisconnectPacket;
 import com.ollie.amogus.networking.MovePacket;
+import com.ollie.amogus.rooms.Rooms;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -24,6 +25,8 @@ public class Crewmate extends GameObject {
     private int modifier;
 
     private Directions directions;
+
+    private Rooms room;
 
     public Crewmate(float x, float y, String userName) {
         super(x, y, 4, new Rectangle((int) x, (int) y, 48, 48));
@@ -66,7 +69,7 @@ public class Crewmate extends GameObject {
         else if (directions == Directions.RIGHT) modifier = 0;
 
          g.drawImage(super.getSprites()[displayNum + modifier], (int) getX(), (int) getY(), super.getSprites()[displayNum + modifier].getWidth()*3,super.getSprites()[displayNum + modifier].getHeight()*3, null);
-         //g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
+         g.drawRect(getCollisionDetector().getBounds().x, getCollisionDetector().getBounds().y, getCollisionDetector().getBounds().width, getCollisionDetector().getBounds().height);
     }
 
     /*
@@ -82,6 +85,11 @@ public class Crewmate extends GameObject {
     public synchronized void updatePos(float x, float y){
         setX(x);
         setY(y);
+
+        getCollisionDetector().setLocation(new Point((int) getX(), (int) getY()));
+
+        this.getCollisionDetector().getBounds().setLocation((int) getX(), (int) getY());
+
 
         MovePacket mp = new MovePacket(getUserName(), getX(), getY(), moving, directions.getNum());
         mp.writeData(Frame.getG().getClient());
@@ -131,6 +139,49 @@ public class Crewmate extends GameObject {
 
     }
 
+    public void changeRooms() {
+        int test = 1;
+
+        for (Rooms room : room.getAdjacentRooms()) {
+            System.out.println(room);
+            for (Rectangle boxes : room.getMoveHitbox()) {
+                if (boxes.intersects(getCollisionDetector())) {
+                    setRoom(room);
+                    System.out.println(getRoom().getName());
+
+                    switch (test) {
+                        case 1 -> {
+                            setNewX(room.getFromX1());
+                            setNewY(room.getFromY1());
+                            MovePacket mp = new MovePacket(getUserName(), getX(), getY(), moving, directions.getNum());
+                            mp.writeData(Frame.getG().getClient());
+                        }
+                        case 2 -> {
+                            setNewX(room.getFromX2());
+                            setNewY(room.getFromY2());
+                            MovePacket mp = new MovePacket(getUserName(), getX(), getY(), moving, directions.getNum());
+                            mp.writeData(Frame.getG().getClient());
+                        }
+                        case 3 -> {
+                            setNewX(room.getFromX3());
+                            setNewY(room.getFromY3());
+                            MovePacket mp = new MovePacket(getUserName(), getX(), getY(), moving, directions.getNum());
+                            mp.writeData(Frame.getG().getClient());
+                        }
+                        case 4 -> {
+                            setNewX(room.getFromX4());
+                            setNewY(room.getFromY4());
+                            MovePacket mp = new MovePacket(getUserName(), getX(), getY(), moving, directions.getNum());
+                            mp.writeData(Frame.getG().getClient());
+                        }
+                    }
+
+                }
+            }
+            test++;
+        }
+    }
+
     public float getRx() {
         return rx;
     }
@@ -141,5 +192,13 @@ public class Crewmate extends GameObject {
 
     public String getUserName() {
         return userName;
+    }
+
+    public Rooms getRoom() {
+        return room;
+    }
+
+    public void setRoom(Rooms room) {
+        this.room = room;
     }
 }

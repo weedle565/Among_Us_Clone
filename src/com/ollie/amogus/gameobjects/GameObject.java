@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 public abstract class GameObject {
 
     private float x, y;
-    private final Shape collisionDetector;
+    private final Rectangle collisionDetector;
 
     private BufferedImage[] sprites;
 
@@ -51,7 +51,7 @@ public abstract class GameObject {
         return sprites;
     }
 
-    public Shape getCollisionDetector() {
+    public Rectangle getCollisionDetector() {
         return collisionDetector;
     }
 

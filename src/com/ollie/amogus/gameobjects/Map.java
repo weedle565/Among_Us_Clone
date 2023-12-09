@@ -3,26 +3,28 @@ package com.ollie.amogus.gameobjects;
 import com.ollie.amogus.gameobjects.entities.Crewmate;
 import com.ollie.amogus.gameobjects.entities.Directions;
 import com.ollie.amogus.gameobjects.entities.MPCrewMate;
+import com.ollie.amogus.helper.Graph;
 import com.ollie.amogus.main.Frame;
 import com.ollie.amogus.main.Game;
 import com.ollie.amogus.networking.MovePacket;
+import com.ollie.amogus.rooms.AdminWalkway;
+import com.ollie.amogus.rooms.Cafeteria;
+import com.ollie.amogus.rooms.Rooms;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Map {
 
     private final ArrayList<Crewmate> crewmates = new ArrayList<>();
-    private final BufferedImage backImage;
     int x, y;
     private final Crewmate localCrewmate;
 
-    private Game g;
+    private final Game g;
     private int counter;
 
     public Map(int x, int y, Game g, Crewmate localCrewmate) throws IOException {
@@ -33,12 +35,6 @@ public class Map {
         this.x = x;
         this.y = y;
         this.counter = 1;
-        backImage = ImageIO.read(Objects.requireNonNull(Map.class.getResource("/resoures/map.png")));
-    }
-
-    public void drawImage(Graphics g) {
-
-        g.drawImage(backImage, getX(), getY(), null);
 
     }
 
@@ -124,6 +120,7 @@ public class Map {
                 crewmate.changeDirection(movingDir);
                 crewmate.setNewX(x);
                 crewmate.setNewY(y);
+                crewmate.getCollisionDetector().getBounds().setLocation(getX(), getY());
 
                 counter++;
             }
@@ -150,4 +147,5 @@ public class Map {
     public ArrayList<Crewmate> getCrewmates() {
         return crewmates;
     }
+
 }

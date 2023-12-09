@@ -8,6 +8,8 @@ import com.ollie.amogus.gameobjects.entities.MPCrewMate;
 import com.ollie.amogus.networking.GameClient;
 import com.ollie.amogus.networking.GameServer;
 import com.ollie.amogus.networking.LoginPacket;
+import com.ollie.amogus.rooms.AdminWalkway;
+import com.ollie.amogus.rooms.Cafeteria;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,6 +60,7 @@ public class Game extends Canvas implements Runnable {
 
         map = new Map(-1400, -70, this, crew);
         map.addCrewMate(crew);
+        crew.setRoom(new Cafeteria());
 
         addKeyListener(new KeyInput());
 
@@ -230,11 +233,13 @@ public class Game extends Canvas implements Runnable {
 
         //Do i need this anymore?
         //@TODO test removing this line.
-        g.setColor(Color.white);
+        g.setColor(Color.black);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        map.drawImage(g);
+        crew.getRoom().drawBackground(g);
+        crew.getRoom().displayMoveHitboxes(g);
         crew.drawImage(g);
+
         map.render(g);
 
         walls.iterator().forEachRemaining(w -> w.drawImage(g));
@@ -249,6 +254,8 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void tick(){
+
+        crew.changeRooms();
 
     }
 
